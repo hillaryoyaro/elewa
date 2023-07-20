@@ -1,68 +1,34 @@
-import express from "express";
-import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import cors from "cors";
-import dotenv from "dotenv";
-import multer from "multer";
-import helmet from "helmet";
-import morgan from "morgan";
-import path from "path";
-import { fileURLToPath } from "url";
-import { register } from "./controllers/auth.js";
+//creating server
+const bodyParser = require('body-parser');
+const express = require('express');
+const morgan = require('morgan');
+const dbConnect = require('./config/dbConnect');
+const { notFound, errorHandler } = require('./middlewares/errorHandler');
+const cookieParser = require("cookie-parser");
+const app = express();
+const dotenv = require ('dotenv').config();
+const PORT = process.env.PORT || 4000;
+const cors = require("cors");
+const authRouter = require("./routes/authRoute");
 
-/**MIDDLEWARE CONFIGURATION **/
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config();
+dbConnect();
 
-const app = express();//to invoke our express appliaction and use the middleware
-app.use(express.json());
-app.use(helmet());
-app.use(helmet.crossOriginResourcePolicy({policy:"cross-origin"}));
-app.use(morgan("common"));
-app.use(bodyParser.json({limit:"30mb", extends: true})); 
-app.use(bodyParser.urlencoded({limit:"30mb",extended:true}));
-app.use(cors());
-//setting the directory where we will keep our assets--images that we will store
-app.use("/assets",express.static(path.join(__dirname,"public/assets")))
+//registering the dependencies
+app.use(bodyParser.json());
+app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({extended:false}));
+app.use(cookieParser());
+app.use(cors({
+    origin: process.env.CORS_ORIGIN
+  }));
 
-/**FILE STORAGE CONFIGURATION**/
-//saving files using multer
-const storage = multer.diskStorage({
-    destination: function (req,file,cb){
-        cb(null,"public/assets");
-    },
-    filename: function (req,file,cb){
-        cb(null,file.originalname)
-    }
+//registering the routes
+app.use("/api/user",authRouter);
+
+
+
+app.use(notFound);
+app.use(errorHandler);
+app.listen(PORT,()=>{
+    console.log(`server is running at PORT ${PORT}`);
 });
-
-//uploading the file we will use upload variable 
-const upload = multer({storage});
-
-/* ROUTES WITH FILES */
-app.post("/auth/register", upload.single("picture"), register);
-app.post("/posts", verifyToken, upload.single("picture"), createPost);
-
-/* MONGOOSE SETUP */
-const PORT = process.env.PORT || 6001;
-
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to MongoDB');
-    // Your server startup code or other actions after successful connection
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
-    process.exit(1); // Exit the Node.js process on connection failure
-  });
-
-
-
-
-
