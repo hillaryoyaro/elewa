@@ -33,6 +33,15 @@ var userSchema = new mongoose.Schema(
       required: true,
       min: 5,
     },
+    role:{
+      type:String,
+      default:"user",
+  },
+  isBlocked:{
+    type:Boolean,
+    default:false,
+  },
+  
     mobile:{
       type:String,
       required:true,
@@ -46,11 +55,15 @@ var userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    refreshToken: {
+      type:String,
+    },
     location: String,
     occupation: String,
     viewedProfile: Number,
     impressions: Number,
   },
+  
   { timestamps: true }
 );
 
