@@ -1,3 +1,5 @@
+//Error Handler
+
 //not found 
 const notFound = (req,res,next) => {
     const error = new Error(`Not Found : ${req.originalUrl}`);

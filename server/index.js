@@ -10,6 +10,7 @@ const dotenv = require ('dotenv').config();
 const PORT = process.env.PORT || 4000;
 const cors = require("cors");
 const authRouter = require("./routes/authRoute");
+const postRouter = require("./routes/postRoute");
 
 dbConnect();
 
@@ -24,7 +25,7 @@ app.use(cors({
 
 //registering the routes
 app.use("/api/user",authRouter);
-
+app.use("/api/post",postRouter);
 
 
 

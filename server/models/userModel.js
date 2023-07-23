@@ -1,6 +1,6 @@
 const mongoose = require('mongoose'); // Erase if already required
 const bcrypt = require('bcrypt');
-//const crypto = require('crypto');
+const crypto = require('crypto');
 const expressAsyncHandler = require('express-async-handler');
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema(
@@ -33,6 +33,10 @@ var userSchema = new mongoose.Schema(
       required: true,
       min: 5,
     },
+    confirmpassword:{
+      type:String,
+      required:true,
+  },
     role:{
       type:String,
       default:"user",
@@ -62,6 +66,9 @@ var userSchema = new mongoose.Schema(
     occupation: String,
     viewedProfile: Number,
     impressions: Number,
+    passwordChangedAt:Date,
+    passwordResetToken:String,
+    passwordResetExpires:Date,
   },
   
   { timestamps: true }
@@ -77,9 +84,28 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password,salt);
 });
 
+//middleware for encryption of confirmpassword
+userSchema.pre('save', async function (next) {
+  const salt =  await bcrypt.genSaltSync(10);  
+  this.confirmpassword = await bcrypt.hash(this.confirmpassword,salt);
+});
+
 //creating login functionality for comparing password
 userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword,this.password)
 }
+
+//Update ,Recover password
+//middleware for reseting password using crypto module
+userSchema.methods.createPasswordResetToken = async function(){
+  const resettoken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+  .createHash('sha256')
+  .update(resettoken)
+  .digest("hex");
+  this.passwordResetExpires = Date.now()+ 30 * 60  * 1000;//10 minutes
+  return resettoken;
+}
+
 //Export the model
 module.exports = mongoose.model('User', userSchema);

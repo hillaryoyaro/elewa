@@ -4,6 +4,8 @@ const { generateToken } = require("../config/jwtToken");
 const validateMongodbId = require("../Utils/validateMongodbId");
 const { generateRefreshToken } = require("../config/refreshToken");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("./emailCtrl");
+const crypto = require("crypto");
 
 
 //Create a user
@@ -201,6 +203,66 @@ const logout = asyncHandler(async (req, res) => {
     res.sendStatus(204); // Forbidden
 });
 
+//Update password
+const updatePassword = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    // extract the password and confirmpassword string values from the req.body object
+    const { password, confirmpassword } = req.body; 
+    validateMongodbId(_id);
+    const user = await User.findById(_id);
+    // check that password and confirmpassword fields are non-empty and match
+    if (password && password === confirmpassword) { 
+      user.password = password;
+      const updatedPassword = await user.save();
+      res.json(updatedPassword);
+      // if password field is empty, return user object without updating password
+    } else if (!password) { 
+      res.json(user);
+    } else { // if password and confirmpassword fields don't match, return error response
+      res.status(400).json({ message: 'Password and confirm password fields do not match' });
+    }
+  });
+
+    //Generate Forgot password Token
+    const forgotPasswordToken = asyncHandler(async(req,res) => {
+        const {email} = req.body;
+        const user = await User.findOne({email});
+        if(!user) throw new Error("User not found with this email");
+        try{
+            const token = await user.createPasswordResetToken();
+            await user.save();
+            const resetURL = `Hi,Please follow this link to reset Your Password. this link is valid till 10 minute from now.<a href='http://localhost:5000/api/user/reset-password/${token}'>Click Here</a>`
+            const data = {
+                to:email,
+                text:"Hello Client",
+                subject:"Forgot Password Link",
+                htm:resetURL,
+            };
+            sendEmail(data);
+            res.json(token);
+        }catch(error){
+            throw new Error(error);
+        }
+      });
+    
+      //Reset password 
+      const resetPassword = asyncHandler(async(req,res) => {
+        const {password} = req.body;
+        const {token} = req.params;
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+        //with help of toke we will find our user
+        const user = await User.findOne({
+            passwordResetToken:hashedToken,
+            passwordResetExpires: {$gt:Date.now() },
+        });
+        if(!user) throw new Error("Toke Expired,Please try again later");
+        user.password =password;
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save();
+        res.json(user);
+      }); 
+    
 
 
         
@@ -214,5 +276,8 @@ module.exports = {
     blockUser,
     unblockUser,
     handleRefreshToken,
-    logout
+    logout,
+    updatePassword,
+    forgotPasswordToken,
+    resetPassword
 };
