@@ -1,4 +1,4 @@
-import {
+import { //this are icons for liking
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
   FavoriteOutlined,
@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
 
+//Creatin a Post Compoenent
 const PostWidget = ({
   postId,
   postUserId,
@@ -23,17 +24,24 @@ const PostWidget = ({
   likes,
   comments,
 }) => {
-  const [isComments, setIsComments] = useState(false);
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.token);
-  const loggedInUserId = useSelector((state) => state.user._id);
-  const isLiked = Boolean(likes[loggedInUserId]);
-  const likeCount = Object.keys(likes).length;
-
-  const { palette } = useTheme();
-  const main = palette.neutral.main;
-  const primary = palette.primary.main;
-
+     //Adding a state that will determine opening up of comment or not
+     const { isComments,setIsComments } = useState(false);
+     const dispatch = useDispatch();
+     //Grab the token from useselector
+     const token = useSelector((state) => state.token);
+     //Grab the Logedin User id
+     const loggedInUserId = useSelector((state) => state.user._id);
+     //to determine if the current user as liked the post
+     const isLiked = Boolean(likes[loggedInUserId]);
+     //Grabs the number of likes from the post
+     const likeCount = Object.keys(likes).length;
+ 
+     //To Grab the color for styling
+     const { palette } = useTheme();
+     const main = palette.neutral.main;
+     const primary = palette.primary.main;
+ 
+     //Function that will change the number of likes
   const patchLike = async () => {
     const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
       method: "PATCH",

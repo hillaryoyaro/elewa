@@ -39,8 +39,9 @@ const Navbar = () => {
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
 
-  const fullName = `${user.firstName} ${user.lastName}`;
-
+ // const fullName = `${user.firstName} ${user.lastName}`;
+  const fullName = user ? `${user.firstName} ${user.lastName}` : "Guest";
+ 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
       <FlexBetween gap="1.75rem">
@@ -56,7 +57,7 @@ const Navbar = () => {
             },
           }}
         >
-          Sociopedia
+          Elewa
         </Typography>
         {isNonMobileScreens && (
           <FlexBetween
@@ -74,6 +75,7 @@ const Navbar = () => {
       </FlexBetween>
 
       {/* DESKTOP NAV */}
+      {/**----navigation dedicated to NonMobile Screen**/}
       {isNonMobileScreens ? (
         <FlexBetween gap="2rem">
           <IconButton onClick={() => dispatch(setMode())}>
@@ -86,6 +88,7 @@ const Navbar = () => {
           <Message sx={{ fontSize: "25px" }} />
           <Notifications sx={{ fontSize: "25px" }} />
           <Help sx={{ fontSize: "25px" }} />
+           {/*Dropdown for login and logout button*/}
           <FormControl variant="standard" value={fullName}>
             <Select
               value={fullName}

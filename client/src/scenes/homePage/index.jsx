@@ -7,6 +7,7 @@ import PostsWidget from "scenes/widgets/PostsWidget";
 import AdvertWidget from "scenes/widgets/AdvertWidget";
 import FriendListWidget from "scenes/widgets/FriendListWidget";
 
+//Creating the HomePage Component
 const HomePage = () => {
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const { _id, picturePath } = useSelector((state) => state.user);
@@ -33,9 +34,9 @@ const HomePage = () => {
         </Box>
         {isNonMobileScreens && (
           <Box flexBasis="26%">
-            <AdvertWidget />
+              <AdvertWidget/>
             <Box m="2rem 0" />
-            <FriendListWidget userId={_id} />
+              <FriendListWidget/>
           </Box>
         )}
       </Box>

@@ -24,11 +24,12 @@ const AdvertWidget = () => {
         style={{ borderRadius: "0.75rem", margin: "0.75rem 0" }}
       />
       <FlexBetween>
-        <Typography color={main}>Elewa Community</Typography>
-        <Typography color={medium}>elewasupport.com</Typography>
+        <Typography color={main}>EmaliCosmetics</Typography>
+        <Typography color={medium}>emalicare.com</Typography>
       </FlexBetween>
       <Typography color={medium} m="0.5rem 0">
-        Need a place to build you career,just kick start with elewa.
+        Your pathway to stunning and immaculate beauty and made sure your skin
+        is exfoliating skin and shining like light.
       </Typography>
     </WidgetWrapper>
   );

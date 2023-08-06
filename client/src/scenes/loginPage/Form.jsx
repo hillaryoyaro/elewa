@@ -7,13 +7,13 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { Formik } from "formik";
-import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setLogin } from "state";
-import Dropzone from "react-dropzone";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";//specific for that icon;
+import { Formik } from "formik";//for formik library
+import * as yup from "yup"; //validation library
+import { useNavigate } from "react-router-dom";//for navigation when they register and login
+import { useDispatch } from "react-redux";//to store our user information
+import { setLogin } from "state";//allow user set their login page
+import Dropzone from "react-dropzone";//help the user put all upload file or image by themselves
 import FlexBetween from "components/FlexBetween";
 
 const registerSchema = yup.object().shape({
@@ -187,6 +187,7 @@ const Form = () => {
                     }
                   >
                     {({ getRootProps, getInputProps }) => (
+                      <FlexBetween>
                       <Box
                         {...getRootProps()}
                         border={`2px dashed ${palette.primary.main}`}
@@ -203,6 +204,7 @@ const Form = () => {
                           </FlexBetween>
                         )}
                       </Box>
+                      </FlexBetween>
                     )}
                   </Dropzone>
                 </Box>
